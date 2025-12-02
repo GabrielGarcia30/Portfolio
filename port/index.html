@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio — Gabriel Vasconcelos</title>
+
+  <style>
+    :root{
+      --bg: #07070b;
+      --panel: #0e0f16;
+      --panel-2: #0a0b11;
+      --fg: #EDEDF6;
+      --muted:#A7A8B8;
+      --line: rgba(255,255,255,0.18);
+      --accent: #7c5cff;
+      --accent-2:#00e0ff;
+      --radius: 22px;
+      --maxw: 1100px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow:hidden;
+    }
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ opacity:.85; }
+
+    /* progress bar */
+    #progress{
+      position:fixed; top:0; left:0; height:3px; width:0%;
+      background: linear-gradient(90deg, var(--accent), #ffffff);
+      z-index:9999;
+    }
+
+    /* fundo com linhas */
+    .bg-lines{
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      opacity:.7;
+      filter: blur(.2px);
+    }
+    .bg-lines svg{ width:100%; height:100%; }
+    .bg-lines .line{
+      fill:none; stroke:var(--line); stroke-width:1.4;
+      transition: transform 0.05s linear;
+    }
+
+    /* área de scroll */
+    main{
+      height:100vh; overflow-y:auto; scroll-behavior:smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    section{
+      min-height:100vh; padding: clamp(24px, 6vw, 80px);
+      scroll-snap-align:start;
+      display:flex; align-items:center; justify-content:center;
+      background:
+        radial-gradient(800px circle at 10% 5%, rgba(124,92,255,0.10), transparent 60%),
+        radial-gradient(900px circle at 90% 20%, rgba(255,255,255,0.06), transparent 60%);
+    }
+
+    .panel{
+      width:100%; max-width:var(--maxw);
+      background: color-mix(in oklab, var(--panel), transparent 6%);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      padding: clamp(18px, 4vw, 42px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+      position:relative;
+      overflow:hidden;
+    }
+    .panel.alt{
+      background: color-mix(in oklab, var(--panel-2), transparent 4%);
+    }
+
+    .kicker{
+      letter-spacing:.18em; text-transform:uppercase;
+      font-size:12px; color:var(--muted);
+      margin-bottom:12px;
+    }
+    h1{
+      font-size: clamp(34px, 6vw, 64px);
+      margin:0 0 10px;
+      line-height:1.1;
+    }
+    h2{
+      font-size: clamp(22px, 3.5vw, 36px);
+      margin:0 0 12px;
+    }
+    p{ margin:0 0 10px; color:var(--muted); }
+
+    .row{
+      display:grid; gap:24px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 900px){
+      .row{ grid-template-columns:1fr; }
+    }
+
+    /* botões */
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .btn{
+      padding:10px 14px; border-radius:999px; font-weight:600;
+      background: rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.08);
+      display:inline-flex; gap:8px; align-items:center;
+      transition:.25s ease;
+    }
+    .btn:hover{ transform: translateY(-2px); background: rgba(255,255,255,0.1); }
+    .btn.primary{
+      background: var(--accent);
+      border-color: transparent;
+      color:white;
+    }
+
+    /* cards */
+    .cards{
+      display:grid; gap:14px;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top:14px;
+    }
+    @media (max-width: 900px){
+      .cards{ grid-template-columns:1fr; }
+    }
+    .card{
+      background: rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:16px; padding:16px;
+      min-height:120px;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .card h3{ margin:0; font-size:18px; }
+    .tag{
+      font-size:12px; color:var(--muted);
+      border:1px dashed rgba(255,255,255,0.15);
+      padding:4px 8px; border-radius:999px; width:max-content;
+    }
+
+    /* projetos horizontal */
+    .hwrap{
+      margin-top:16px;
+      display:flex; gap:14px; overflow-x:auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom:8px;
+
+      /* firefox */
+      scrollbar-color: var(--accent) rgba(255,255,255,0.10);
+      scrollbar-width: thin;
+    }
+    .hcard{
+      flex:0 0 78%;
+      scroll-snap-align:center;
+      background: rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px; padding:18px;
+      display:grid; gap:14px;
+      grid-template-columns: 1fr 1fr;
+      align-items:center;
+    }
+    @media (max-width: 900px){
+      .hcard{ grid-template-columns:1fr; flex-basis:88%; }
+    }
+    .thumb{
+      height:220px; border-radius:14px;
+      background:
+        linear-gradient(135deg, rgba(124,92,255,0.35), transparent 55%),
+        linear-gradient(0deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    /* ✅ custom scrollbar webkit (Chrome/Edge/Safari) */
+    .hwrap::-webkit-scrollbar{
+      height: 10px; /* espessura */
+    }
+    .hwrap::-webkit-scrollbar-track{
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    .hwrap::-webkit-scrollbar-thumb{
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px rgba(124,92,255,0.6);
+      border: 2px solid rgba(0,0,0,0.35);
+    }
+    .hwrap::-webkit-scrollbar-thumb:hover{
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      box-shadow: 0 0 16px rgba(0,224,255,0.7);
+    }
+
+    /* skills */
+    .skillgrid{
+      display:grid; gap:10px; grid-template-columns: repeat(4,1fr);
+      margin-top:10px;
+    }
+    @media (max-width: 700px){
+      .skillgrid{ grid-template-columns: repeat(2,1fr); }
+    }
+    .skill{
+      padding:10px 12px; border-radius:12px;
+      background: rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      font-weight:600; font-size:14px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--accent);
+      box-shadow:0 0 12px rgba(124,92,255,0.9);
+    }
+
+    /* reveal */
+    .reveal{
+      opacity:0; transform: translateY(20px);
+      transition: 700ms ease;
+    }
+    .reveal.show{
+      opacity:1; transform: translateY(0);
+    }
+
+    footer{
+      padding:18px; text-align:center; color:var(--muted); font-size:13px;
+    }
+
+    /* -------------------------
+      HERO COM IMAGEM / BLOB
+    --------------------------*/
+    .hero-layout{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 24px;
+      align-items:center;
+    }
+    @media (max-width: 900px){
+      .hero-layout{
+        grid-template-columns:1fr;
+        text-align:center;
+      }
+    }
+
+    .hero-imgwrap{
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      margin-left: auto;
+      aspect-ratio: 1 / 1.15;
+      border-radius: 26px;
+      overflow: visible;
+      isolation: isolate;
+    }
+    @media (max-width: 900px){
+      .hero-imgwrap{ margin: 16px auto 0; max-width: 290px; }
+    }
+
+    .hero-blob{
+      position:absolute; inset:-8%;
+      z-index:0;
+      filter: blur(0.2px);
+      transform: translateY(0px) rotate(0deg);
+      transition: transform 0.05s linear;
+    }
+
+    .hero-sticker{
+      position:relative; z-index:2;
+      width:100%; height:100%;
+      border-radius: 999px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.65),
+        0 0 70px rgba(124,92,255,0.40);
+    }
+
+    .hero-sticker img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      object-position: center top;
+      transform: translateY(0) scale(1.02);
+      filter: saturate(1.05) contrast(1.02);
+    }
+
+    .hero-sticker::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(120% 120% at 80% 10%, rgba(0,224,255,.22), transparent 55%),
+        radial-gradient(120% 120% at 10% 80%, rgba(124,92,255,.25), transparent 60%);
+      mix-blend-mode: soft-light;
+      opacity:.75;
+      pointer-events:none;
+    }
+
+    .hero-sticker::before{
+      content:"";
+      position:absolute; inset:-4px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.35);
+      filter: drop-shadow(0 8px 25px rgba(0,0,0,.6));
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="progress"></div>
+
+  <!-- Background Lines -->
+  <div class="bg-lines">
+    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+      <path class="line" d="M-200 120 Q 250 30 1200 150" />
+      <path class="line" d="M-200 260 Q 320 180 1200 300" />
+      <path class="line" d="M-200 420 Q 300 320 1200 470" />
+      <path class="line" d="M-200 600 Q 380 520 1200 640" />
+      <path class="line" d="M-200 760 Q 340 700 1200 820" />
+      <path class="line" d="M-200 910 Q 280 880 1200 940" />
+    </svg>
+  </div>
+
+  <main id="scrollArea">
+
+    <!-- HERO -->
+    <section>
+      <div class="panel hero-layout">
+
+        <div class="hero-text">
+          <div class="kicker reveal">portfolio</div>
+          <h1 class="reveal">
+            Gabriel Vasconcelos<br/>
+            <span style="color:var(--muted); font-weight:500;">Dev / FrontEnd</span>
+          </h1>
+          <p class="reveal" style="max-width:70ch;">
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
+          </p>
+
+          <div class="btns reveal">
+            <a class="btn primary" href="#projects">Ver projetos</a>
+            <a class="btn" href="#about">Sobre mim</a>
+            <a class="btn" href="#contact">Contacto</a>
+          </div>
+        </div>
+
+        <!-- IMAGEM À DIREITA -->
+        <div class="hero-imgwrap reveal">
+          <svg class="hero-blob" viewBox="0 0 200 220" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="rgba(124,92,255,0.9)"/>
+                <stop offset="100%" stop-color="rgba(0,224,255,0.8)"/>
+              </linearGradient>
+            </defs>
+            <path fill="url(#g1)" opacity="0.25"
+              d="M 40 20 C 80 0 130 10 155 40 C 180 70 205 85 195 120 C 185 155 160 190 120 205 C 80 220 35 210 18 175 C 0 140 0 70 40 20 Z"/>
+          </svg>
+
+          <div class="hero-sticker">
+            <img src="img/me.png" alt="me" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="panel alt row">
+        <div>
+          <div class="kicker reveal">sobre</div>
+          <h2 class="reveal">Quem eu sou</h2>
+          <p class="reveal">
+            Estou agora a acabar um curso de desenvolvimento de Software
+          </p>
+          <p class="reveal">
+            As vezes posso não saber tudo, mas estou ca para aprender 
+            e melhorar as minhas competências.
+          </p>
+        </div>
+
+        <div class="reveal">
+          <div class="thumb"></div>
+          <p style="margin-top:10px;">procurar foto</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="panel">
+        <div class="kicker reveal">trabalho</div>
+        <h2 class="reveal">Projetos em destaque</h2>
+        <p class="reveal">Scroll horizontal aqui. Cada card é um projeto.</p>
+
+        <div class="hwrap reveal">
+          <article class="hcard">
+            <div>
+              <div class="tag">Web App</div>
+              <h3 style="margin:.4rem 0 0;">Projeto 01 — Nome</h3>
+              <p>1–2 linhas sobre o que é e o impacto.</p>
+              <div class="btns">
+                <a class="btn" href="#">Demo</a>
+                <a class="btn" href="#">Código</a>
+              </div>
+            </div>
+            <div class="thumb"></div>
+          </article>
+
+          <article class="hcard">
+            <div>
+              <div class="tag">UI / Design</div>
+              <h3 style="margin:.4rem 0 0;">Projeto 02 — Nome</h3>
+              <p>Breve descrição, stack e resultado.</p>
+              <div class="btns">
+                <a class="btn" href="#">Case</a>
+                <a class="btn" href="#">Figma</a>
+              </div>
+            </div>
+            <div class="thumb"></div>
+          </article>
+
+          <article class="hcard">
+            <div>
+              <div class="tag">Experimento</div>
+              <h3 style="margin:.4rem 0 0;">Projeto 03 — Nome</h3>
+              <p>Algo diferente que mostre personalidade tua.</p>
+              <div class="btns">
+                <a class="btn" href="#">Ver mais</a>
+              </div>
+            </div>
+            <div class="thumb"></div>
+          </article>
+        </div>
+
+        <div style="margin-top:18px;" class="reveal">
+          <div class="cards">
+            <article class="card">
+              <div class="tag">Mini projeto</div>
+              <h3>Extra 01</h3>
+              <p>Descrição curtinha.</p>
+            </article>
+            <article class="card">
+              <div class="tag">Mini projeto</div>
+              <h3>Extra 02</h3>
+              <p>Descrição curtinha.</p>
+            </article>
+            <article class="card">
+              <div class="tag">Mini projeto</div>
+              <h3>Extra 03</h3>
+              <p>Descrição curtinha.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="panel alt">
+        <div class="kicker reveal">stack</div>
+        <h2 class="reveal">Ferramentas & Skills</h2>
+        <p class="reveal">Tecnologias que aprendi ao longo do meu percurso</p>
+
+        <div class="skillgrid reveal">
+          <div class="skill"><span>HTML/CSS</span><span class="dot"></span></div>
+          <div class="skill"><span>JavaScript</span><span class="dot"></span></div>
+          <div class="skill"><span>React</span><span class="dot"></span></div>
+          <div class="skill"><span>C#</span><span class="dot"></span></div>
+          <div class="skill"><span>Figma</span><span class="dot"></span></div>
+          <div class="skill"><span>Phyton</span><span class="dot"></span></div>
+          <div class="skill"><span>UI/UX</span><span class="dot"></span></div>
+          <div class="skill"><span>Git</span><span class="dot"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="panel">
+        <div class="kicker reveal">contacto</div>
+        <h2 class="reveal">Vamos falar</h2>
+        <p class="reveal">Deixo aqui os meus contactos e as  minhas redes</p>
+
+        <div class="cards reveal" style="grid-template-columns:repeat(2,1fr);">
+          <article class="card">
+            <h3>Email</h3>
+            <p>gabrielvasconcelos3009@gmail.com</p>
+          </article>
+          <article class="card">
+            <h3>Redes</h3>
+            <p>GitHub · LinkedIn · Behance · Instagram</p>
+          </article>
+        </div>
+
+        <div class="btns reveal" style="margin-top:16px;">
+          <a class="btn primary" href="mailto:teuemail@exemplo.com">Enviar email</a>
+          <a class="btn" href="#">Download CV</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Gabriel Vasconcelos 
+    </footer>
+
+  </main>
+
+  <script>
+    const scrollArea = document.getElementById("scrollArea");
+    const progress = document.getElementById("progress");
+    const lines = document.querySelectorAll(".bg-lines .line");
+    const blob = document.querySelector(".hero-blob");
+    const stickerImg = document.querySelector(".hero-sticker img");
+
+    scrollArea.addEventListener("scroll", () => {
+      const max = scrollArea.scrollHeight - scrollArea.clientHeight;
+      const t = scrollArea.scrollTop;
+      const pct = (t / max) * 100;
+      progress.style.width = pct + "%";
+
+      lines.forEach((l, i) => {
+        const speed = 0.06 + i * 0.02;
+        l.style.transform = `translateY(${t * speed}px)`;
+      });
+
+      if(blob){
+        const rot = t * 0.03;
+        const floaty = Math.sin(t * 0.004) * 8;
+        blob.style.transform = `translateY(${floaty}px) rotate(${rot}deg) scale(1.02)`;
+      }
+
+      if(stickerImg){
+        const imgFloat = Math.sin(t * 0.004) * 4;
+        stickerImg.style.transform = `translateY(${6 + imgFloat}px) scale(1.03)`;
+      }
+    });
+
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add("show");
+      });
+    }, { threshold: 0.18 });
+
+    document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
